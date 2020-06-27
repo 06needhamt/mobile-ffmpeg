@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package com.arthenica.mobileffmpeg.sdl;
+package com.arthenica.mobileffmpeg.player.sdl;
 
 import android.content.Context;
 import android.content.pm.ActivityInfo;
@@ -39,6 +39,8 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
+
+import com.arthenica.mobileffmpeg.FFplay;
 
 /**
  * SDLSurface. This is what we draw on, so we need to know when it's created
@@ -111,7 +113,7 @@ public class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
         SDLActivity.handleNativeState();
 
         SDLActivity.mIsSurfaceReady = false;
-        SDLActivity.onNativeSurfaceDestroyed();
+        FFplay.playerOnSurfaceDestroyed();
     }
 
     // Called when the surface is resized
@@ -167,7 +169,7 @@ public class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
 
         mWidth = width;
         mHeight = height;
-        SDLActivity.onNativeResize(width, height, sdlFormat, mDisplay.getRefreshRate());
+        FFplay.playerOnResize(width, height, sdlFormat, mDisplay.getRefreshRate());
         Log.v("SDL", "Window size: " + width + "x" + height);
 
 
@@ -207,7 +209,7 @@ public class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
         SDLActivity.mIsSurfaceReady = true;
 
         /* If the surface has been previously destroyed by onNativeSurfaceDestroyed, recreate it here */
-        SDLActivity.onNativeSurfaceChanged();
+        FFplay.playerOnSurfaceChanged();
 
         SDLActivity.handleNativeState();
     }
@@ -225,11 +227,11 @@ public class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
         if (SDLControllerManager.isDeviceSDLJoystick(event.getDeviceId())) {
             // Note that we process events with specific key codes here
             if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                if (SDLControllerManager.onNativePadDown(event.getDeviceId(), keyCode) == 0) {
+                if (FFplay.controllerOnPadDown(event.getDeviceId(), keyCode) == 0) {
                     return true;
                 }
             } else if (event.getAction() == KeyEvent.ACTION_UP) {
-                if (SDLControllerManager.onNativePadUp(event.getDeviceId(), keyCode) == 0) {
+                if (FFplay.controllerOnPadUp(event.getDeviceId(), keyCode) == 0) {
                     return true;
                 }
             }
@@ -239,13 +241,13 @@ public class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
             if (event.getAction() == KeyEvent.ACTION_DOWN) {
                 //Log.v("SDL", "key down: " + keyCode);
                 if (SDLActivity.isTextInputEvent(event)) {
-                    SDLInputConnection.nativeCommitText(String.valueOf((char) event.getUnicodeChar()), 1);
+                    FFplay.inputCommitText(String.valueOf((char) event.getUnicodeChar()), 1);
                 }
-                SDLActivity.onNativeKeyDown(keyCode);
+                FFplay.playerOnKeyDown(keyCode);
                 return true;
             } else if (event.getAction() == KeyEvent.ACTION_UP) {
                 //Log.v("SDL", "key up: " + keyCode);
-                SDLActivity.onNativeKeyUp(keyCode);
+                FFplay.playerOnKeyUp(keyCode);
                 return true;
             }
         }
@@ -280,7 +282,7 @@ public class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
         float x, y, p;
 
         // !!! FIXME: dump this SDK check after 2.0.4 ships and require API14.
-        if (event.getSource() == InputDevice.SOURCE_MOUSE && SDLActivity.mSeparateMouseAndTouch) {
+        if (event.getSource() == InputDevice.SOURCE_MOUSE && FFplay.isSeparateMouseAndTouch()) {
             if (Build.VERSION.SDK_INT < 14) {
                 mouseButton = 1; // all mouse buttons are the left button
             } else {
@@ -290,7 +292,7 @@ public class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
                     mouseButton = 1;    // oh well.
                 }
             }
-            SDLActivity.onNativeMouse(mouseButton, action, event.getX(0), event.getY(0));
+            FFplay.playerOnMouse(mouseButton, action, event.getX(0), event.getY(0));
         } else {
             switch (action) {
                 case MotionEvent.ACTION_MOVE:
@@ -304,7 +306,7 @@ public class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
                             // see the documentation of getPressure(i)
                             p = 1.0f;
                         }
-                        SDLActivity.onNativeTouch(touchDevId, pointerFingerId, action, x, y, p);
+                        FFplay.playerOnTouch(touchDevId, pointerFingerId, action, x, y, p);
                     }
                     break;
 
@@ -328,7 +330,7 @@ public class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
                         // see the documentation of getPressure(i)
                         p = 1.0f;
                     }
-                    SDLActivity.onNativeTouch(touchDevId, pointerFingerId, action, x, y, p);
+                    FFplay.playerOnTouch(touchDevId, pointerFingerId, action, x, y, p);
                     break;
 
                 case MotionEvent.ACTION_CANCEL:
@@ -342,7 +344,7 @@ public class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
                             // see the documentation of getPressure(i)
                             p = 1.0f;
                         }
-                        SDLActivity.onNativeTouch(touchDevId, pointerFingerId, MotionEvent.ACTION_UP, x, y, p);
+                        FFplay.playerOnTouch(touchDevId, pointerFingerId, MotionEvent.ACTION_UP, x, y, p);
                     }
                     break;
 
@@ -394,7 +396,7 @@ public class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
                     y = event.values[1];
                     break;
             }
-            SDLActivity.onNativeAccel(-x / SensorManager.GRAVITY_EARTH,
+            FFplay.playerOnAccel(-x / SensorManager.GRAVITY_EARTH,
                     y / SensorManager.GRAVITY_EARTH,
                     event.values[2] / SensorManager.GRAVITY_EARTH);
         }

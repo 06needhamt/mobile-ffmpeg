@@ -67,6 +67,7 @@
 
 #include <assert.h>
 
+#include "mobileffmpeg.h"
 #include "mobileffmpeg_exception.h"
 
 #define MAX_QUEUE_SIZE (15 * 1024 * 1024)
@@ -3770,6 +3771,8 @@ int ffplay_execute(int argc, char **argv)
         { "filter_threads", HAS_ARG | OPT_INT | OPT_EXPERT, { &filter_nbthreads }, "number of filter threads per graph" },
         { NULL, },
     };
+
+    LOGE("FFPLAY CALLED.");
 
     ffplay_options = options;
 

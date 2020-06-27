@@ -19,10 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package com.arthenica.mobileffmpeg.sdl;
+package com.arthenica.mobileffmpeg.player.sdl;
 
 import android.view.InputDevice;
 import android.view.MotionEvent;
+
+import com.arthenica.mobileffmpeg.FFplay;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -70,7 +72,7 @@ public class SDLJoystickHandler {
                     }
 
                     mJoysticks.add(joystick);
-                    SDLControllerManager.nativeAddJoystick(joystick.device_id, joystick.name, joystick.desc, 0, -1,
+                    FFplay.controllerAddJoystick(joystick.device_id, joystick.name, joystick.desc, 0, -1,
                             joystick.axes.size(), joystick.hats.size() / 2, 0);
                 }
             }
@@ -91,7 +93,7 @@ public class SDLJoystickHandler {
 
         for (int i = 0; i < removedDevices.size(); i++) {
             int device_id = removedDevices.get(i);
-            SDLControllerManager.nativeRemoveJoystick(device_id);
+            FFplay.controllerRemoveJoystick(device_id);
             for (int j = 0; j < mJoysticks.size(); j++) {
                 if (mJoysticks.get(j).device_id == device_id) {
                     mJoysticks.remove(j);
@@ -122,12 +124,12 @@ public class SDLJoystickHandler {
                             InputDevice.MotionRange range = joystick.axes.get(i);
                             /* Normalize the value to -1...1 */
                             float value = (event.getAxisValue(range.getAxis(), actionPointerIndex) - range.getMin()) / range.getRange() * 2.0f - 1.0f;
-                            SDLControllerManager.onNativeJoy(joystick.device_id, i, value);
+                            FFplay.controllerOnJoy(joystick.device_id, i, value);
                         }
                         for (int i = 0; i < joystick.hats.size(); i += 2) {
                             int hatX = Math.round(event.getAxisValue(joystick.hats.get(i).getAxis(), actionPointerIndex));
                             int hatY = Math.round(event.getAxisValue(joystick.hats.get(i + 1).getAxis(), actionPointerIndex));
-                            SDLControllerManager.onNativeHat(joystick.device_id, i / 2, hatX, hatY);
+                            FFplay.controllerOnHat(joystick.device_id, i / 2, hatX, hatY);
                         }
                     }
                     break;

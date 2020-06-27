@@ -20,18 +20,16 @@
 package com.arthenica.mobileffmpeg.test;
 
 import android.app.AlertDialog;
-import android.media.MediaPlayer;
-import android.net.Uri;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.AndroidRuntimeException;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.MediaController;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -43,6 +41,7 @@ import com.arthenica.mobileffmpeg.LogCallback;
 import com.arthenica.mobileffmpeg.LogMessage;
 import com.arthenica.mobileffmpeg.Statistics;
 import com.arthenica.mobileffmpeg.StatisticsCallback;
+import com.arthenica.mobileffmpeg.player.sdl.SDLActivity;
 import com.arthenica.mobileffmpeg.util.DialogUtil;
 import com.arthenica.mobileffmpeg.util.ResourcesUtil;
 import com.arthenica.mobileffmpeg.util.SingleExecuteCallback;
@@ -57,7 +56,7 @@ import static com.arthenica.mobileffmpeg.test.MainActivity.TAG;
 
 public class VideoTabFragment extends Fragment implements AdapterView.OnItemSelectedListener {
 
-    private VideoView videoView;
+    protected static ViewGroup mLayout;
     private AlertDialog progressDialog;
     private String selectedCodec;
     private Statistics statistics;
@@ -88,8 +87,6 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
                 }
             });
         }
-
-        videoView = view.findViewById(R.id.videoPlayerFrame);
 
         progressDialog = DialogUtil.createProgressDialog(requireContext(), "Encoding video");
 
@@ -155,7 +152,7 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
         try {
 
             // IF VIDEO IS PLAYING STOP PLAYBACK
-            videoView.stopPlayback();
+            // videoView.stopPlayback();
 
             if (videoFile.exists()) {
                 videoFile.delete();
@@ -234,7 +231,7 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
     }
 
     protected void playVideo() {
-        MediaController mediaController = new MediaController(requireContext());
+        /* MediaController mediaController = new MediaController(requireContext());
         mediaController.setAnchorView(videoView);
         videoView.setVideoURI(Uri.parse("file://" + getVideoFile().getAbsolutePath()));
         videoView.setMediaController(mediaController);
@@ -254,7 +251,11 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
                 return false;
             }
         });
-        videoView.start();
+        videoView.start();*/
+
+        Intent intent = new Intent(getContext(), SDLActivity.class);
+        intent.putExtra("filename", getVideoFile().getAbsolutePath());
+        startActivity(intent);
     }
 
     public String getSelectedVideoCodec() {

@@ -26,6 +26,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name="com.arthenica.mobileffmpeg.player.sdl.SDLActivity"
+            android:label="play"
+            android:configChanges="keyboardHidden|orientation"
+            android:screenOrientation="landscape"
+            android:process=":process.sub"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
+        </activity>
+
     </application>
 
 </manifest>

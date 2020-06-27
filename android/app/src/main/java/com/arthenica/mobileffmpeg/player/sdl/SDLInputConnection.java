@@ -19,20 +19,23 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package com.arthenica.mobileffmpeg.sdl;
+package com.arthenica.mobileffmpeg.player.sdl;
 
 import android.content.Context;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.BaseInputConnection;
 
+import com.arthenica.mobileffmpeg.FFplay;
+
 public class SDLInputConnection extends BaseInputConnection {
+    private final Context context;
 
-    public SDLInputConnection(View targetView, boolean fullEditor) {
+    public SDLInputConnection(View targetView, boolean fullEditor, Context context) {
         super(targetView, fullEditor);
-    }
 
-    public static native void nativeCommitText(String text, int newCursorPosition);
+        this.context = context;
+    }
 
     @Override
     public boolean sendKeyEvent(KeyEvent event) {
@@ -47,19 +50,16 @@ public class SDLInputConnection extends BaseInputConnection {
          * Return DOES still generate a key event, however.  So rather than using it as the 'click a button' key
          * as we do with physical keyboards, let's just use it to hide the keyboard.
          */
-
         if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-            String imeHide = SDLActivity.nativeGetHint("SDL_RETURN_KEY_HIDES_IME");
+            String imeHide = FFplay.playerNativeGetHint("SDL_RETURN_KEY_HIDES_IME");
             if ((imeHide != null) && imeHide.equals("1")) {
-                Context c = SDL.getContext();
-                if (c instanceof SDLActivity) {
-                    SDLActivity activity = (SDLActivity) c;
+                if (context instanceof SDLActivity) {
+                    SDLActivity activity = (SDLActivity) context;
                     activity.sendCommand(SDLActivity.COMMAND_TEXTEDIT_HIDE, null);
                     return true;
                 }
             }
         }
-
 
         return super.sendKeyEvent(event);
     }
@@ -69,25 +69,19 @@ public class SDLInputConnection extends BaseInputConnection {
 
         for (int i = 0; i < text.length(); i++) {
             char c = text.charAt(i);
-            nativeGenerateScancodeForUnichar(c);
+            FFplay.inputGenerateScancodeForUnichar(c);
         }
 
-        SDLInputConnection.nativeCommitText(text.toString(), newCursorPosition);
+        FFplay.inputCommitText(text.toString(), newCursorPosition);
 
         return super.commitText(text, newCursorPosition);
     }
 
     @Override
     public boolean setComposingText(CharSequence text, int newCursorPosition) {
-
-        nativeSetComposingText(text.toString(), newCursorPosition);
-
+        FFplay.inputSetComposingText(text.toString(), newCursorPosition);
         return super.setComposingText(text, newCursorPosition);
     }
-
-    public native void nativeGenerateScancodeForUnichar(char c);
-
-    public native void nativeSetComposingText(String text, int newCursorPosition);
 
     @Override
     public boolean deleteSurroundingText(int beforeLength, int afterLength) {
@@ -106,4 +100,5 @@ public class SDLInputConnection extends BaseInputConnection {
 
         return super.deleteSurroundingText(beforeLength, afterLength);
     }
+
 }

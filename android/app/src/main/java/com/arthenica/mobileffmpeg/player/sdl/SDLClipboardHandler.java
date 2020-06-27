@@ -19,17 +19,19 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package com.arthenica.mobileffmpeg.sdl;
+package com.arthenica.mobileffmpeg.player.sdl;
 
 import android.content.ClipboardManager;
 import android.content.Context;
+
+import com.arthenica.mobileffmpeg.FFplay;
 
 public class SDLClipboardHandler implements ClipboardManager.OnPrimaryClipChangedListener {
 
     protected android.content.ClipboardManager mClipMgr;
 
     SDLClipboardHandler() {
-        mClipMgr = (android.content.ClipboardManager) SDL.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+        mClipMgr = (android.content.ClipboardManager) FFplay.getActivityContext().getSystemService(Context.CLIPBOARD_SERVICE);
         mClipMgr.addPrimaryClipChangedListener(this);
     }
 
@@ -55,7 +57,7 @@ public class SDLClipboardHandler implements ClipboardManager.OnPrimaryClipChange
 
     @Override
     public void onPrimaryClipChanged() {
-        SDLActivity.onNativeClipboardChanged();
+        FFplay.playerOnClipboardChanged();
     }
 
 }

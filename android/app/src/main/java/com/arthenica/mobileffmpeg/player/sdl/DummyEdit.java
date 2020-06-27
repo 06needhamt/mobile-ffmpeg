@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package com.arthenica.mobileffmpeg.sdl;
+package com.arthenica.mobileffmpeg.player.sdl;
 
 import android.content.Context;
 import android.text.InputType;
@@ -28,14 +28,17 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 
+import com.arthenica.mobileffmpeg.FFplay;
+
 /**
  * This is a fake invisible editor view that receives the input and defines the pan&scan region
  */
 public class DummyEdit extends View implements View.OnKeyListener {
-    private InputConnection ic;
+    private InputConnection inputConnection;
 
     public DummyEdit(Context context) {
         super(context);
+
         setFocusableInTouchMode(true);
         setFocusable(true);
         setOnKeyListener(this);
@@ -54,13 +57,13 @@ public class DummyEdit extends View implements View.OnKeyListener {
          */
         if (event.getAction() == KeyEvent.ACTION_DOWN) {
             if (SDLActivity.isTextInputEvent(event)) {
-                ic.commitText(String.valueOf((char) event.getUnicodeChar()), 1);
+                inputConnection.commitText(String.valueOf((char) event.getUnicodeChar()), 1);
                 return true;
             }
-            SDLActivity.onNativeKeyDown(keyCode);
+            FFplay.playerOnKeyDown(keyCode);
             return true;
         } else if (event.getAction() == KeyEvent.ACTION_UP) {
-            SDLActivity.onNativeKeyUp(keyCode);
+            FFplay.playerOnKeyUp(keyCode);
             return true;
         }
         return false;
@@ -76,7 +79,7 @@ public class DummyEdit extends View implements View.OnKeyListener {
         // FIXME: An even more effective way would be if Android provided this out of the box, but where would the fun be in that :)
         if (event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
             if (SDLActivity.mTextEdit != null && SDLActivity.mTextEdit.getVisibility() == View.VISIBLE) {
-                SDLActivity.onNativeKeyboardFocusLost();
+                FFplay.playerOnKeyboardFocusLost();
             }
         }
         return super.onKeyPreIme(keyCode, event);
@@ -84,12 +87,12 @@ public class DummyEdit extends View implements View.OnKeyListener {
 
     @Override
     public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
-        ic = new SDLInputConnection(this, true);
+        inputConnection = new SDLInputConnection(this, true, getContext());
 
         outAttrs.inputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD;
         outAttrs.imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI | EditorInfo.IME_FLAG_NO_FULLSCREEN;
 
-        return ic;
+        return inputConnection;
     }
 
 }

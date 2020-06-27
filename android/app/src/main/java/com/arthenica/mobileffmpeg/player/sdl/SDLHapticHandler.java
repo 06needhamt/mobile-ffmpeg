@@ -19,13 +19,15 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package com.arthenica.mobileffmpeg.sdl;
+package com.arthenica.mobileffmpeg.player.sdl;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
 import android.os.Vibrator;
 import android.view.InputDevice;
+
+import com.arthenica.mobileffmpeg.FFplay;
 
 import java.util.ArrayList;
 
@@ -68,14 +70,14 @@ public class SDLHapticHandler {
                         haptic.name = device.getName();
                         haptic.vib = vib;
                         mHaptics.add(haptic);
-                        SDLControllerManager.nativeAddHaptic(haptic.device_id, haptic.name);
+                        FFplay.controllerAddHaptic(haptic.device_id, haptic.name);
                     }
                 }
             }
         }
 
         /* Check VIBRATOR_SERVICE */
-        Vibrator vib = (Vibrator) SDL.getContext().getSystemService(Context.VIBRATOR_SERVICE);
+        Vibrator vib = (Vibrator) FFplay.getActivityContext().getSystemService(Context.VIBRATOR_SERVICE);
         if (vib != null) {
             hasVibratorService = vib.hasVibrator();
 
@@ -87,7 +89,7 @@ public class SDLHapticHandler {
                     haptic.name = "VIBRATOR_SERVICE";
                     haptic.vib = vib;
                     mHaptics.add(haptic);
-                    SDLControllerManager.nativeAddHaptic(haptic.device_id, haptic.name);
+                    FFplay.controllerAddHaptic(haptic.device_id, haptic.name);
                 }
             }
         }
@@ -110,7 +112,7 @@ public class SDLHapticHandler {
 
         for (int i = 0; i < removedDevices.size(); i++) {
             int device_id = removedDevices.get(i);
-            SDLControllerManager.nativeRemoveHaptic(device_id);
+            FFplay.controllerRemoveHaptic(device_id);
             for (int j = 0; j < mHaptics.size(); j++) {
                 if (mHaptics.get(j).device_id == device_id) {
                     mHaptics.remove(j);

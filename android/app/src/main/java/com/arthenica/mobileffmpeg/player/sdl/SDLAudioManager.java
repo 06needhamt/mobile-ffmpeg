@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package com.arthenica.mobileffmpeg.sdl;
+package com.arthenica.mobileffmpeg.player.sdl;
 
 import android.media.AudioFormat;
 import android.media.AudioManager;
@@ -28,9 +28,9 @@ import android.media.AudioTrack;
 import android.media.MediaRecorder;
 import android.util.Log;
 
-public class SDLAudioManager {
-    protected static final String TAG = "SDLAudio";
+import static com.arthenica.mobileffmpeg.Config.TAG;
 
+public class SDLAudioManager implements com.arthenica.mobileffmpeg.player.AudioManager {
     protected static AudioTrack mAudioTrack;
     protected static AudioRecord mAudioRecord;
 
@@ -39,13 +39,8 @@ public class SDLAudioManager {
         mAudioRecord = null;
     }
 
-    // Audio
-
-    /**
-     * This method is called by SDL using JNI.
-     */
-    public static int audioOpen(int sampleRate, boolean is16Bit, boolean isStereo, int desiredFrames) {
-        int channelConfig = isStereo ? AudioFormat.CHANNEL_CONFIGURATION_STEREO : AudioFormat.CHANNEL_CONFIGURATION_MONO;
+    public int audioOpen(final int sampleRate, final boolean is16Bit, final boolean isStereo, int desiredFrames) {
+        int channelConfig = isStereo ? AudioFormat.CHANNEL_OUT_STEREO : AudioFormat.CHANNEL_OUT_MONO;
         int audioFormat = is16Bit ? AudioFormat.ENCODING_PCM_16BIT : AudioFormat.ENCODING_PCM_8BIT;
         int frameSize = (isStereo ? 2 : 1) * (is16Bit ? 2 : 1);
 
@@ -78,10 +73,7 @@ public class SDLAudioManager {
         return 0;
     }
 
-    /**
-     * This method is called by SDL using JNI.
-     */
-    public static void audioWriteShortBuffer(short[] buffer) {
+    public void audioWriteShortBuffer(final short[] buffer) {
         if (mAudioTrack == null) {
             Log.e(TAG, "Attempted to make audio call with uninitialized audio!");
             return;
@@ -104,10 +96,7 @@ public class SDLAudioManager {
         }
     }
 
-    /**
-     * This method is called by SDL using JNI.
-     */
-    public static void audioWriteByteBuffer(byte[] buffer) {
+    public void audioWriteByteBuffer(final byte[] buffer) {
         if (mAudioTrack == null) {
             Log.e(TAG, "Attempted to make audio call with uninitialized audio!");
             return;
@@ -130,11 +119,8 @@ public class SDLAudioManager {
         }
     }
 
-    /**
-     * This method is called by SDL using JNI.
-     */
-    public static int captureOpen(int sampleRate, boolean is16Bit, boolean isStereo, int desiredFrames) {
-        int channelConfig = isStereo ? AudioFormat.CHANNEL_CONFIGURATION_STEREO : AudioFormat.CHANNEL_CONFIGURATION_MONO;
+    public int captureOpen(final int sampleRate, final boolean is16Bit, final boolean isStereo, int desiredFrames) {
+        int channelConfig = isStereo ? AudioFormat.CHANNEL_IN_STEREO : AudioFormat.CHANNEL_IN_MONO;
         int audioFormat = is16Bit ? AudioFormat.ENCODING_PCM_16BIT : AudioFormat.ENCODING_PCM_8BIT;
         int frameSize = (isStereo ? 2 : 1) * (is16Bit ? 2 : 1);
 
@@ -165,29 +151,19 @@ public class SDLAudioManager {
         return 0;
     }
 
-    /**
-     * This method is called by SDL using JNI.
-     */
-    public static int captureReadShortBuffer(short[] buffer, boolean blocking) {
+    public int captureReadShortBuffer(final short[] buffer, final boolean blocking) {
         // !!! FIXME: this is available in API Level 23. Until then, we always block.  :(
         //return mAudioRecord.read(buffer, 0, buffer.length, blocking ? AudioRecord.READ_BLOCKING : AudioRecord.READ_NON_BLOCKING);
         return mAudioRecord.read(buffer, 0, buffer.length);
     }
 
-    /**
-     * This method is called by SDL using JNI.
-     */
-    public static int captureReadByteBuffer(byte[] buffer, boolean blocking) {
+    public int captureReadByteBuffer(final byte[] buffer, final boolean blocking) {
         // !!! FIXME: this is available in API Level 23. Until then, we always block.  :(
         //return mAudioRecord.read(buffer, 0, buffer.length, blocking ? AudioRecord.READ_BLOCKING : AudioRecord.READ_NON_BLOCKING);
         return mAudioRecord.read(buffer, 0, buffer.length);
     }
 
-
-    /**
-     * This method is called by SDL using JNI.
-     */
-    public static void audioClose() {
+    public void audioClose() {
         if (mAudioTrack != null) {
             mAudioTrack.stop();
             mAudioTrack.release();
@@ -195,17 +171,12 @@ public class SDLAudioManager {
         }
     }
 
-    /**
-     * This method is called by SDL using JNI.
-     */
-    public static void captureClose() {
+    public void captureClose() {
         if (mAudioRecord != null) {
             mAudioRecord.stop();
             mAudioRecord.release();
             mAudioRecord = null;
         }
     }
-
-    public static native int nativeSetupJNI();
 
 }

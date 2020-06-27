@@ -19,38 +19,17 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package com.arthenica.mobileffmpeg.sdl;
+package com.arthenica.mobileffmpeg.player.sdl;
 
 import android.view.InputDevice;
 import android.view.MotionEvent;
 
-public class SDLControllerManager {
+import com.arthenica.mobileffmpeg.player.ControllerManager;
 
-    private static final String TAG = "SDLControllerManager";
+public class SDLControllerManager implements ControllerManager {
+
     protected static SDLJoystickHandler mJoystickHandler;
     protected static SDLHapticHandler mHapticHandler;
-
-    public static native int nativeSetupJNI();
-
-    public static native int nativeAddJoystick(int device_id, String name, String desc,
-                                               int is_accelerometer, int nbuttons,
-                                               int naxes, int nhats, int nballs);
-
-    public static native int nativeRemoveJoystick(int device_id);
-
-    public static native int nativeAddHaptic(int device_id, String name);
-
-    public static native int nativeRemoveHaptic(int device_id);
-
-    public static native int onNativePadDown(int device_id, int keycode);
-
-    public static native int onNativePadUp(int device_id, int keycode);
-
-    public static native void onNativeJoy(int device_id, int axis,
-                                          float value);
-
-    public static native void onNativeHat(int device_id, int hat_id,
-                                          int x, int y);
 
     public static void initialize() {
         mJoystickHandler = null;
@@ -64,34 +43,32 @@ public class SDLControllerManager {
         mHapticHandler = new SDLHapticHandler();
     }
 
-    // Joystick glue code, just a series of stubs that redirect to the SDLJoystickHandler instance
-    public static boolean handleJoystickMotionEvent(MotionEvent event) {
+    /**
+     * Joystick glue code, just a series of stubs that redirect to the SDLJoystickHandler instance.
+     */
+    public static boolean handleJoystickMotionEvent(final MotionEvent event) {
         return mJoystickHandler.handleMotionEvent(event);
     }
 
-    /**
-     * This method is called by SDL using JNI.
-     */
-    public static void pollInputDevices() {
+    public void pollInputDevices() {
         mJoystickHandler.pollInputDevices();
     }
 
-    /**
-     * This method is called by SDL using JNI.
-     */
-    public static void pollHapticDevices() {
+    public void pollHapticDevices() {
         mHapticHandler.pollHapticDevices();
     }
 
-    /**
-     * This method is called by SDL using JNI.
-     */
-    public static void hapticRun(int device_id, int length) {
-        mHapticHandler.run(device_id, length);
+    public void hapticRun(final int deviceId, final int length) {
+        mHapticHandler.run(deviceId, length);
     }
 
-    // Check if a given device is considered a possible SDL joystick
-    public static boolean isDeviceSDLJoystick(int deviceId) {
+    /**
+     * Check if a given device is considered a possible SDL joystick.
+     *
+     * @param deviceId device identifier
+     * @return true if device is a joystick, false otherwise
+     */
+    public static boolean isDeviceSDLJoystick(final int deviceId) {
         InputDevice device = InputDevice.getDevice(deviceId);
         // We cannot use InputDevice.isVirtual before API 16, so let's accept
         // only nonnegative device ids (VIRTUAL_KEYBOARD equals -1)
