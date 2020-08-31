@@ -374,7 +374,7 @@ ${SED_INLINE} 's/static int av_log_level/__thread int av_log_level/g' ${BASEDIR}
     --enable-jni \
     --enable-optimizations \
     --enable-swscale \
-    --enable-shared \
+    --enable-static \
     --enable-v4l2-m2m \
     --disable-outdev=fbdev \
     --disable-indev=fbdev \
@@ -383,14 +383,14 @@ ${SED_INLINE} 's/static int av_log_level/__thread int av_log_level/g' ${BASEDIR}
     --disable-xmm-clobber-test \
     ${DEBUG_OPTIONS} \
     --disable-neon-clobber-test \
-    --disable-programs \
+    --disable-ffplay \
     --disable-postproc \
     --disable-doc \
     --disable-htmlpages \
     --disable-manpages \
     --disable-podpages \
     --disable-txtpages \
-    --disable-static \
+    --disable-shared \
     --disable-sndio \
     --disable-schannel \
     --disable-securetransport \
